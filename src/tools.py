@@ -388,15 +388,15 @@ def display_and_check_invulnerability_star(player, screen, game):
             game["popup_start_time"] = pygame.time.get_ticks()
 
 def show_inv_shield(player, screen):
-    if inv_star_on:
+    if player["inv_star_on"]:
         current_time = pygame.time.get_ticks()
-        if current_time - star_invulnerability_start_time < INVULNERABILITY_STAR_DURATION:
+        if current_time - player["star_invulnerability_start_time"] < INVULNERABILITY_STAR_DURATION:
             shield_x = player["hitbox"]["rct"].centerx - inv_star_shield.get_width() // 2
             shield_y = player["hitbox"]["rct"].centery - inv_star_shield.get_height() // 2
             screen.blit(inv_star_shield, (shield_x, shield_y))
         else:
-            inv_star_on = False
-            star_invulnerability_start_time = None
+            player["inv_star_on"] = False
+            player["star_invulnerability_start_time"] = None
 
 #Rino
 def create_rino_block(level:str):
@@ -438,7 +438,7 @@ def rino_hit_player(player, rino):
 def launch_rino_events(rino, player, screen, number):
     if rino["live"]:
         handle_rino_movement(rino, number)
-        rino_hit_player(rino, player)
+        rino_hit_player(player, rino)
         laser_hit_enemy(player, rino)
         show_animation(screen, rino["animation"], 10, rino["hitbox"]["rct"].x, rino["hitbox"]["rct"].y)
 
@@ -478,18 +478,23 @@ def trunk_shooting(trunk, player):
             trunk["bullet"]["rct"].x -= trunk["bullet"]["speed"]
         else:
             trunk["bullet"]["rct"].x += trunk["bullet"]["speed"]
-            
-    # Trunk shoot hit player
-    if not player["inv_star_on"]:
-        if not player["hit_invulnerability"]:
+        
+        # Trunk shoot hit player
+        if not player["inv_star_on"] and not player["hit_invulnerability"]:
             if detectar_colision(player["hitbox"]["rct"], trunk["bullet"]["rct"]):
                 player["hearts"] -= 1
                 trunk["bullet"] = None
-    # No interatction with player
-    else:
+                return  # Exit the function early after collision
+        
+        # Remove bullet if it goes off screen
+        if trunk["bullet"]["rct"].right < 0 or trunk["bullet"]["rct"].left > SCREEN_WIDTH:
+            trunk["bullet"] = None
+    
+    # Set animation if there's no bullet
+    if not trunk["bullet"]:
         trunk["animation"] = get_animation_direction(trunk_idle_left, trunk_idle_right, trunk["direction"])
 
-def launch_trunk_events(trunk, player, screen) :
+def launch_trunk_events(trunk, player, screen):
     if trunk["live"]:
         laser_hit_enemy(player, trunk)
         player_in_vision = trunk_sees_player(player, trunk)
@@ -501,6 +506,8 @@ def launch_trunk_events(trunk, player, screen) :
             trunk["animation"] = get_animation_direction(trunk_idle_left, trunk_idle_right, trunk["direction"])
         
         show_animation(screen, trunk["animation"], 10, trunk["hitbox"]["rct"].x, trunk["hitbox"]["rct"].y)
+    else:
+        trunk["bullet"] = None
 
 # Drawing
 def handle_visual_effects(player, screen):

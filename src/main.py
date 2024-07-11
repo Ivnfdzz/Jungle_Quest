@@ -91,10 +91,10 @@ def level_1():
             # Hearts hud updating
             get_health_image(player)
             
-            playtime = pygame.time.get_ticks()
+            game["playtime"] = pygame.time.get_ticks()
             
             if level_1_condition(trunk, rino, player):
-                level_2(player, playtime)
+                level_2(player, game)
             
             SCREEN.blit(player["heart_image"], (HEARTS_GUI_POSITION[0], HEARTS_GUI_POSITION[1]))
             SCREEN.blit(stars_hud, (STARS_POSITION[0], STARS_POSITION[1]))
@@ -103,7 +103,7 @@ def level_1():
             # Refresh screen
             pygame.display.flip()
 
-def level_2(past_player, playtime):
+def level_2(past_player, game):
     #level 2
     while True:
         pygame.mixer_music.play()
@@ -126,7 +126,7 @@ def level_2(past_player, playtime):
         
         # Game
         game = game_flags()
-        game["playtime"] = playtime
+        new_playtime = game["playtime"]
 
         while True:
             clock.tick(FPS)
@@ -179,7 +179,7 @@ def level_2(past_player, playtime):
 
             show_star_popup(game, SCREEN)
             
-            new_playtime = playtime + pygame.time.get_ticks()
+            new_playtime = game["playtime"] + pygame.time.get_ticks()
             if level_2_condition(trunk, rino, trunk_2, player):
                 level_3(player, new_playtime)
 
@@ -202,20 +202,20 @@ def level_3(past_player, playtime):
         trunk_2 = create_trunk(5, "right")
         
         # Enemy "rino"
-        rino = create_rino_block(3, "left")
+        rino = create_rino(3, "left")
         
         # Enemy "rino 2"
-        rino_2 = create_rino_block(4, "left")
+        rino_2 = create_rino(4, "left")
         
         # Enemy "rino_3"
-        rino_3 = create_rino_block(5, "right")
+        rino_3 = create_rino(5, "right")
         
         # Map
         platforms = create_level_platforms(3)
         
         # Game
         game = game_flags()
-        game["playtime"] = new_playtime
+        new_playtime = playtime
         # Game loop
         while True:
             clock.tick(FPS)
@@ -241,7 +241,7 @@ def level_3(past_player, playtime):
                 # Release keys detection
                 keyup_detection(event, player)
 
-            launch_player_events(player, platforms)
+            launch_player_events(player, platforms, SCREEN)
             
             game["game_over"] = check_player_death(player, game)
             
