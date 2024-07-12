@@ -2,6 +2,25 @@ from settings import *
 import pygame
 
 def load_animation(path:str, ext:str, frames:int, width:int, height:int, starts_at_zero: bool = False)->tuple:
+    """Loads and scales a series of images to create right and left facing animations.
+
+    Args:
+    path (str): The base path to the image files.
+    ext (str): The file extension of the images.
+    frames (int): The number of frames in the animation.
+    width (int): The desired width of each frame.
+    height (int): The desired height of each frame.
+    starts_at_zero (bool, optional): If True, frame numbering starts at 0; otherwise, starts at 1. Defaults to False.
+
+    Returns:
+    tuple: A tuple containing two lists:
+        - right_animation: List of images for the right-facing animation.
+        - left_animation: List of images for the left-facing animation.
+
+    Raises:
+    FileNotFoundError: If an image file is not found, a warning is printed and the frame is skipped.
+    """
+
     right_animation = []
     left_animation = []
     start_frame = 0 if starts_at_zero else 1
@@ -16,7 +35,20 @@ def load_animation(path:str, ext:str, frames:int, width:int, height:int, starts_
         left_animation.append(pygame.transform.flip(image, True, False))
     return (right_animation, left_animation)
 
-def load_scaled_image(file_name:str, width:int, height:int):
+def load_scaled_image(file_name:str, width:int, height:int)-> pygame.Surface:
+    """Loads an image from a file and scales it to the specified dimensions.
+
+    Args:
+    file_name (str): The path to the image file.
+    width (int): The desired width of the scaled image.
+    height (int): The desired height of the scaled image.
+
+    Returns:
+    pygame.Surface: The loaded and scaled image.
+
+    Raises:
+    pygame.error: If the image cannot be loaded.
+    """
     image = pygame.image.load(file_name)
     image = pygame.transform.scale(image, (width, height))
     return image

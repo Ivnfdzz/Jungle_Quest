@@ -1,4 +1,13 @@
-def resize_with_aspect_ratio(size, scale_factor):
+def resize_with_aspect_ratio(size:list, scale_factor:float)-> list:
+    """Resizes a given size while maintaining its aspect ratio.
+
+    Args:
+    size (list): A tuple or list containing the original width and height.
+    scale_factor (float): The factor by which to scale the size.
+
+    Returns: 
+    list: A list containing the new width and height, scaled according to the given factor.
+    """
     width, height = size
     new_width = int(width * scale_factor)
     new_height = int(height * scale_factor)
