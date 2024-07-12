@@ -61,10 +61,10 @@ hearts_0 = load_scaled_image("./src/assets/images/gui/hearts/hearts_0.png", HEAR
 stars_hud = load_scaled_image("./src/assets/images/gui/stars.png", STARS_SIZE[0], STARS_SIZE[1])
 
 # Popups
-start_popup = load_scaled_image("./src/assets/images/gui/popups/start_popup.png", POPUP_SIZE[0], POPUP_SIZE[1])
-popup_inv_star = load_scaled_image("./src/assets/images/gui/popups/inv_star_power_popup.png", POPUP_SIZE[0], POPUP_SIZE[1])
-gameover_popup = load_scaled_image("./src/assets/images/gui/popups/gameover.png", POPUP_SIZE[0], POPUP_SIZE[1])
-fail_gameover_popup = load_scaled_image("./src/assets/images/gui/popups/fail_gameover.png", POPUP_SIZE[0], POPUP_SIZE[1])
+start_popup = load_scaled_image("./src/assets/images/gui/es_popups/es_start_popup.png", POPUP_SIZE[0], POPUP_SIZE[1])
+popup_inv_star = load_scaled_image("./src/assets/images/gui/es_popups/es_inv_star_power_popup.png", POPUP_SIZE[0], POPUP_SIZE[1])
+gameover_popup = load_scaled_image("./src/assets/images/gui/es_popups/es_gameover.png", POPUP_SIZE[0], POPUP_SIZE[1])
+fail_gameover_popup = load_scaled_image("./src/assets/images/gui/es_popups/es_fail_gameover.png", POPUP_SIZE[0], POPUP_SIZE[1])
 
 # Animations:
 # Player

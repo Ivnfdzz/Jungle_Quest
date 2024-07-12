@@ -14,11 +14,11 @@ pygame.display.set_icon(pygame.image.load("./src/assets/images/gui/icon.png"))
 clock = pygame.time.Clock()
 # Font settings
 font = pygame.font.SysFont("Daydream", 30)
+pygame.mixer_music.play()
 
 def level_1():
     #level1
     while True:
-        pygame.mixer_music.play()
         # Player
         player = create_player()
         
@@ -103,7 +103,6 @@ def level_1():
 def level_2(past_player, game):
     #level 2
     while True:
-        pygame.mixer_music.play()
         # Player
         player = create_player(player_hearts= past_player["hearts"], heart_image= past_player["heart_image"],got_invulnerability_star= False, stars_count= past_player["stars_count"])
         
@@ -183,9 +182,8 @@ def level_2(past_player, game):
 
 def level_3(past_player, playtime):
     while True:
-        pygame.mixer_music.play()
         # Player
-        player = create_player(player_hearts= past_player["hearts"], heart_image= past_player["heart_image"],got_invulnerability_star= past_player["got_invulnerability_star"], stars_count= past_player["stars_count"])
+        player = create_player(player_hearts= past_player["hearts"], heart_image= past_player["heart_image"],got_invulnerability_star= past_player["got_invulnerability_star"], stars_count= past_player["stars_count"], inv_star_used=past_player["inv_star_used"])
         
         # Enemy "trunk"
         trunk = create_trunk(4, "left")
@@ -274,9 +272,8 @@ def level_3(past_player, playtime):
 def level_4(past_player, playtime):
     #level4
     while True:
-        pygame.mixer_music.play()
         # Player
-        player = create_player(player_hearts= past_player["hearts"], heart_image= past_player["heart_image"],got_invulnerability_star= past_player["got_invulnerability_star"], stars_count= past_player["stars_count"])
+        player = create_player(player_hearts= past_player["hearts"], heart_image= past_player["heart_image"],got_invulnerability_star= past_player["got_invulnerability_star"], stars_count= past_player["stars_count"], inv_star_used=past_player["inv_star_used"])
         
         # Enemy "rino"
         rino = create_rino(6, "left")

@@ -136,7 +136,7 @@ def create_level_platforms(level):
 def create_player_block(imagen: pygame.Surface = None):
     return create_block(imagen, PJ_POSITION[0], PJ_POSITION[1], PJ_WIDTH, PJ_HEIGHT, GREEN, 0, 0, vel_y=0, on_ground=True, double_jump_used=False)
 
-def create_player(player_hearts:int=5, heart_image:pygame.Surface= hearts_5, got_invulnerability_star=False, stars_count=0):
+def create_player(player_hearts:int=5, heart_image:pygame.Surface= hearts_5, got_invulnerability_star=False, stars_count=0, inv_star_used= False):
     return {
         "hitbox": create_player_block(),
         "hearts": player_hearts,
@@ -161,7 +161,7 @@ def create_player(player_hearts:int=5, heart_image:pygame.Surface= hearts_5, got
         "animation": None,
         "inv_star_on": False,
         "star_invulnerability_start_time": 0,
-        "inv_star_used": False,
+        "inv_star_used": inv_star_used,
         "visual_effect": None,
         "visual_effect_start_time": 0,
         "visual_effect_location": (0, 0)
@@ -291,12 +291,11 @@ def key_mute_detection(event, game):
         else:
             pygame.mixer.music.unpause()
             game["playing_music"] = True
-    return game
 
 def key_pause_detection(event, screen, font, game):
     if event.key == K_p:
         pygame.mixer.music.pause()
-        show_text(screen, SCREEN_CENTER, "Pause", font, MAGENTA)
+        show_text(screen, SCREEN_CENTER, "Pause", font, GREEN)
         wait_user(K_p)
         if game["playing_music"]:
             pygame.mixer.music.unpause()
@@ -327,7 +326,7 @@ def keydown_detection(event, player, game, screen, font):
         key_movement_detection(player, event)
         
         # Mute
-        game["playing_music"] = key_mute_detection(event, screen)
+        key_mute_detection(event, game)
         
         # Pause
         key_pause_detection(event, screen, font, game)
@@ -396,6 +395,7 @@ def show_inv_shield(player, screen):
         else:
             player["inv_star_on"] = False
             player["star_invulnerability_start_time"] = None
+            player["inv_star_used"] = True
 
 #Rino
 def create_rino_block(level:str):
@@ -540,6 +540,7 @@ def launch_drawing_events(player, screen, trunks, playing_music, font):
     player_laser_drawing(player, screen)
     handle_visual_effects(player, screen)
     mute_drawing(playing_music, screen, font)
+    show_inv_shield(player, screen)
     if isinstance(trunks, list):
         for trunk in trunks:
             trunk_bullet_drawing(trunk, screen)
@@ -587,6 +588,7 @@ def endscreen(game, player, screen):
             game["show_popup"] = False
             quit_game()
         else:
+            game["in_pause"] = True
             screen.blit(gameover_popup, (0,0))
     if player["got_artifact"]:
         game["show_popup"] = True
