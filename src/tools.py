@@ -432,6 +432,23 @@ def player_hit_invulnerability(player:dict)-> None:
         if current_time - player["hit_invulnerability_start_time"] > PLAYER_HIT_INVULNERABILITY_DURATION:
             player["hit_invulnerability"] = False
 
+def handle_drop_through_platform(player: dict, platforms: list) -> None:
+    """Allows the player to drop through platforms when pressing 's'.
+
+    Args:
+    player (dict): The player object.
+    platforms (list): A list of platform objects.
+    """
+    for platform in platforms:
+        if (player["hitbox"]["rct"].bottom == platform["rct"].top and
+            player["hitbox"]["rct"].right > platform["rct"].left and
+            player["hitbox"]["rct"].left < platform["rct"].right):
+            if platform["rct"].bottom < GROUND_LEVEL:
+                player["hitbox"]["rct"].top = platform["rct"].bottom
+                player["vel_y"] = 1
+                player["on_ground"] = False
+                break
+
 def launch_player_events(player:dict, platforms:list, screen:pygame.Surface)-> None:
     """Launches all player-related events.
 
@@ -484,20 +501,22 @@ def key_space_detection(player:dict, game:dict, event:pygame.event)-> None:
             player["double_jump_used"] = True
             player_jump_sound.play()
 
-def key_movement_detection(player:dict, event:pygame.event)-> None:
+def key_movement_detection(player: dict, event: pygame.event, platforms: list) -> None:
     """Handles movement key events.
 
     Args:
     player (dict): The player object.
     event (pygame.event.Event): The key event.
+    platforms (list): A list of platform objects.
     """
     if event.key == K_a:
         player["move_left"] = True
         player["direction"] = "left"
-
     if event.key == K_d:
         player["move_right"] = True
         player["direction"] = "right"
+    if event.key == K_s:
+        handle_drop_through_platform(player, platforms)
 
 def key_mute_detection(event:pygame.event, game:dict)-> None:
     """Handles mute key events.
@@ -561,7 +580,7 @@ def key_inv_star_detection(player:dict, event:pygame.event)-> None:
                 player["inv_star_used"] = True
                 inv_star_use_sound.play()
 
-def keydown_detection(event:pygame.event, player:dict, game:dict, screen:pygame.Surface, font:pygame.font)-> None:
+def keydown_detection(event:pygame.event, player:dict, game:dict, screen:pygame.Surface, font:pygame.font, platforms:pygame.Rect)-> None:
     """Handles all keydown events.
 
     Args:
@@ -570,13 +589,14 @@ def keydown_detection(event:pygame.event, player:dict, game:dict, screen:pygame.
     game (dict): The game object.
     screen (pygame.Surface): The game screen.
     font (pygame.font): The font to use for text.
+    platforms (pygame.Rect): The game platforms
     """
     if event.type == KEYDOWN:
         # Jumping or skipping pop ups
         key_space_detection(player, game, event)
         
         # Movement
-        key_movement_detection(player, event)
+        key_movement_detection(player, event, platforms)
         
         # Mute
         key_mute_detection(event, game)
@@ -589,6 +609,7 @@ def keydown_detection(event:pygame.event, player:dict, game:dict, screen:pygame.
         
         #inv_star
         key_inv_star_detection(player, event)
+        
 
 def keyup_detection(event:pygame.event, player:dict)-> None:
     """Handles all keyup events.
@@ -1104,36 +1125,38 @@ def get_player_name(screen:pygame.Surface, font:pygame.font):
     Returns:
         str: The name entered by the user.
     """
+    # Box where player will write his name
     input_box = pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 - 25, 200, 50)
-    color_inactive = pygame.Color('lightskyblue3')
-    color_active = pygame.Color('dodgerblue2')
-    color = color_inactive
-    active = False
+    # Box color
+    color = GREEN
+    # Inicialize the text as an empty string
     text = ''
+    # Text imput not done
     done = False
 
     while not done:
+        # Detect pygame events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit_game()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if input_box.collidepoint(event.pos):
-                    active = not active
-                else:
-                    active = False
-                color = color_active if active else color_inactive
             if event.type == pygame.KEYDOWN:
-                if active:
-                    if event.key == pygame.K_RETURN:
-                        done = True
-                    elif event.key == pygame.K_BACKSPACE:
-                        text = text[:-1]
-                    else:
-                        text += event.unicode
-        screen.fill((30, 30, 30))
+                # player press enter when finishes writting his name
+                if event.key == pygame.K_RETURN:
+                    done = True
+                # Player can delete text
+                elif event.key == pygame.K_BACKSPACE:
+                    text = text[:-1]
+                # Every other key will be saved on text
+                else:
+                    text += event.unicode
+        # Set a background
+        screen.blit(menu_background, (0, 0))
+        # Rendering the text
         txt_surface = font.render(text, True, color)
+        # Make the input box big enough to fit the text
         width = max(200, txt_surface.get_width() + 10)
         input_box.w = width
+        # Drawing the text, a title and the box
         screen.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
         pygame.draw.rect(screen, color, input_box, 2)
         show_text(screen, (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 50), "Enter your name:", font, (255, 255, 255))

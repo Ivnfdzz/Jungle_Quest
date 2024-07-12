@@ -65,7 +65,7 @@ def level_1():
                     quit_game()
                 
                 # Press keys detection
-                keydown_detection(event, player, game, SCREEN, font)
+                keydown_detection(event, player, game, SCREEN, font, platforms)
                     
                 # Release keys detection
                 keyup_detection(event, player)
@@ -138,7 +138,7 @@ def level_2(past_player):
                 if event.type == QUIT:
                     quit_game()
                 
-                keydown_detection(event, player, game, SCREEN, font)
+                keydown_detection(event, player, game, SCREEN, font, platforms)
                 # Release keys detection
                 keyup_detection(event, player)
 
@@ -223,7 +223,7 @@ def level_3(past_player):
                 if event.type == QUIT:
                     quit_game()
                 
-                keydown_detection(event, player, game, SCREEN, font)
+                keydown_detection(event, player, game, SCREEN, font, platforms)
                 # Release keys detection
                 keyup_detection(event, player)
 
@@ -315,7 +315,7 @@ def level_4(past_player):
                 if event.type == QUIT:
                     quit_game()
                 
-                keydown_detection(event, player, game, SCREEN, font)
+                keydown_detection(event, player, game, SCREEN, font, platforms)
                 # Release keys detection
                 keyup_detection(event, player)
 

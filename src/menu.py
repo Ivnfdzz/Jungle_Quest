@@ -13,10 +13,13 @@ csv_path = os.path.join("src", "scores.csv")
 
 # Function to load the configuration from a JSON file
 def load_config():
+    # Cheks if config file exists
     if os.path.exists(config_path):
+        # Read the json file
         with open(config_path, "r") as file:
             return json.load(file)
     else:
+        # Default config
         return {"music_playing": True}
 
 # Function to save the configuration to a JSON file
@@ -24,27 +27,36 @@ def save_config(config):
     with open(config_path, "w") as file:
         json.dump(config, file, indent=4)
 
-# Function to load scores from a CSV file and sort them
+# load scores from a CSV file and sort them
 def load_scores():
+    # Return list
     scores = []
+    # Check if the csv file exists
     if os.path.exists(csv_path):
+        # Open csv file on read mode
         with open(csv_path, newline='') as csvfile:
+            # Saves the content in the csv
             reader = csv.reader(csvfile)
             for row in reader:
+                # Check if exists at least a score
                 if len(row) >= 2:
                     try:
+                        # Saves the score as a tuple
                         scores.append((row[0], int(row[1])))
                     except ValueError:
+                        # If row 2 is not a number prints an error
                         print(f"Error converting score to int for row: {row}")
                 else:
+                    # If there is not enough elements in the row
                     print(f"Row has insufficient elements: {row}")
-    
+    # Based on the second tuple's element (score), sorts the list 
     scores.sort(key=lambda x: x[1], reverse=True)
-    
+    # Return the best 10 scores
     return scores[:10]
 
-# Function to display the scores on the screen
+
 def display_scores(scores):
+    # Y position    
     y_offset = 200 
     for i, (name, score) in enumerate(scores):
         text = f"{i+1}. {name}: {score}"
@@ -138,26 +150,7 @@ def main_menu():
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         pygame.display.flip()
 
-# Function to display a scenario screen (not implemented in full)
-def play_scenario():
-    while True:
-        SCREEN.blit(menu_background, (0, 0))
-        mouse_over_button = False
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                quit_game()
-        text_surf = font.render("SCREEN 1", True, BLACK)
-        SCREEN.blit(text_surf, (SCREEN_WIDTH // 2 - text_surf.get_width() // 2, SCREEN_HEIGHT // 2 - text_surf.get_height() // 2))
-        if draw_image_button(back_button, (MID_SCREEN_WIDTH, 500), main_menu):
-            mouse_over_button = True
-        if mouse_over_button:
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-        else:
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
-
-        pygame.display.flip()
-
-# Function to display the leaderboards screen
+# Display the leaderboards screen
 def leaderboards_screen():
     scores = load_scores()
     while True:
@@ -181,43 +174,31 @@ def leaderboards_screen():
         
         pygame.display.flip()
 
-# Function to display the options screen
+# Display the options screen
 def options_screen():
     global music_playing
+    # Game loop
     while True:
         SCREEN.blit(menu_background, (0, 0))
         mouse_over_button = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit_game()
+        # Title
         text_surf = font.render("Options", True, GREEN)
         SCREEN.blit(text_surf, (SCREEN_WIDTH // 2 - text_surf.get_width() // 2, 150 - text_surf.get_height() // 2 - 100))
+        # Back button
         if draw_image_button(back_button, (50, 50), main_menu):
             mouse_over_button = True
 
+        # Mute button
         if draw_image_button(mute_button, (MID_SCREEN_WIDTH, MID_SCREEN_HEIGHT), toggle_music):
             mouse_over_button = True
+        # Change cursor
         if mouse_over_button:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
         else:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         pygame.display.flip()
 
-# Function to display the game over screen (not implemented in full)
-def gameover_screen():
-    while True:
-        SCREEN.blit(menu_background, (0, 0))
-        mouse_over_button = False
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                quit_game()
-        text_surf = font.render("SCREEN 2", True, BLACK)
-        SCREEN.blit(text_surf, (SCREEN_WIDTH // 2 - text_surf.get_width() // 2, SCREEN_HEIGHT // 2 - text_surf.get_height() // 2))
-        if draw_image_button(back_button, (50, 50), main_menu):
-            mouse_over_button = True
-        if mouse_over_button:
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-        else:
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
-
-main_menu()  # Start the game with the main menu
+main_menu()
