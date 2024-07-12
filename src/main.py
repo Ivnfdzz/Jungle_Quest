@@ -33,6 +33,8 @@ def level_1():
         
         # Game
         game = game_flags()
+        game["show_popup"] = True
+        
         # Game loop
         while True:
             clock.tick(FPS)
@@ -72,7 +74,6 @@ def level_1():
 
             # Player
             launch_player_events(player, platforms, SCREEN)
-            
             game["game_over"] = check_player_death(player, game)
             
             SCREEN.blit(level_1_background, (0, 0))
@@ -88,17 +89,13 @@ def level_1():
             # Drawings
             launch_drawing_events(player, SCREEN, trunk, game, font)
             
-            # Hearts hud updating
-            get_health_image(player)
+            # GUI
+            show_hud(SCREEN, player, font)
+            
             
             game["playtime"] = pygame.time.get_ticks()
-            
             if level_1_condition(trunk, rino, player):
                 level_2(player, game)
-            
-            SCREEN.blit(player["heart_image"], (HEARTS_GUI_POSITION[0], HEARTS_GUI_POSITION[1]))
-            SCREEN.blit(stars_hud, (STARS_POSITION[0], STARS_POSITION[1]))
-            show_text(SCREEN, (STARS_POSITION[0] + 80, STARS_POSITION[1] + 25), f"{player["stars_count"]}", font, YELLOW)
             
             # Refresh screen
             pygame.display.flip()
@@ -108,11 +105,9 @@ def level_2(past_player, game):
     while True:
         pygame.mixer_music.play()
         # Player
-        
         player = create_player(player_hearts= past_player["hearts"], heart_image= past_player["heart_image"],got_invulnerability_star= False, stars_count= past_player["stars_count"])
         
         # Enemy "trunk"
-        
         trunk = create_trunk(2, "left")
         
         # Enemy "trunk 2"
@@ -173,19 +168,16 @@ def level_2(past_player, game):
             # Drawings
             launch_drawing_events(player, SCREEN, [trunk, trunk_2], game, font)
             
-            get_health_image(player)
-            
+            # Invulnerability star
             display_and_check_invulnerability_star(player, SCREEN, game)
-
             show_star_popup(game, SCREEN)
+            
+            # GUI
+            show_hud(SCREEN, player, font)
             
             new_playtime = game["playtime"] + pygame.time.get_ticks()
             if level_2_condition(trunk, rino, trunk_2, player):
                 level_3(player, new_playtime)
-
-            SCREEN.blit(player["heart_image"], (HEARTS_GUI_POSITION[0], HEARTS_GUI_POSITION[1]))
-            SCREEN.blit(stars_hud, (STARS_POSITION[0], STARS_POSITION[1]))
-            show_text(SCREEN, (STARS_POSITION[0] + 80, STARS_POSITION[1] + 25), f"{player["stars_count"]}", font, YELLOW)
             # Refresh screen
             pygame.display.flip()
 
@@ -242,7 +234,6 @@ def level_3(past_player, playtime):
                 keyup_detection(event, player)
 
             launch_player_events(player, platforms, SCREEN)
-            
             game["game_over"] = check_player_death(player, game)
             
             # Showing images and animations
@@ -269,16 +260,13 @@ def level_3(past_player, playtime):
             # Draw the player laser
             launch_drawing_events(player, SCREEN, [trunk, trunk_2], game, font)
             
-            get_health_image(player)
+            # GUI
+            show_hud(SCREEN, player, font)
             
             
             new_playtime = playtime + pygame.time.get_ticks()
             if level_3_condition(trunk, rino, trunk_2, rino_2, rino_3, player):
                 level_4(player, new_playtime)
-            
-            SCREEN.blit(player["heart_image"], (HEARTS_GUI_POSITION[0], HEARTS_GUI_POSITION[1]))
-            SCREEN.blit(stars_hud, (STARS_POSITION[0], STARS_POSITION[1]))
-            show_text(SCREEN, (STARS_POSITION[0] + 80, STARS_POSITION[1] + 25), f"{player["stars_count"]}", font, YELLOW)
             
             # Refresh screen
             pygame.display.flip()
@@ -347,51 +335,39 @@ def level_4(past_player, playtime):
             # Showing images and animations
             SCREEN.blit(level_4_background, (0, 0))
             
-            #Rino enemy:
+            #Rino 1 enemy:
             launch_rino_events(rino, player, SCREEN, 6)
             
-            #Rino enemy:
+            #Rino 2 enemy:
             launch_rino_events(rino_2, player, SCREEN, 7)
             
+            # Rino 3 enemy
             launch_rino_events(rino_3, player, SCREEN, 8)
             
+            # Rino 4 enemy
             launch_rino_events(rino_4, player, SCREEN, 9)
             
+            # Trunk 1 enemy
             launch_trunk_events(trunk, player, SCREEN)
-            # Player animation
             
+            # Trunk 2 enemy
             launch_trunk_events(trunk_2, player, SCREEN)
             
+            # Player animation
             show_animation(SCREEN, player["animation"], 10, player["hitbox"]["rct"].x, player["hitbox"]["rct"].y)
             
             # Draw the player laser
             launch_drawing_events(player, SCREEN, [trunk, trunk_2], game, font)
             
+            artifact_appear_condition(trunk, trunk_2, rino, rino_2, rino_3, SCREEN, player, game)
+            
+            # GUI
             get_health_image(player)
-            
-            
-            if not trunk["live"] and not trunk_2["live"] and not rino["live"] and not rino_2["live"] and not rino_3["live"]:
-                SCREEN.blit(artifact_image, (ARTIFACT_POSITION[0], ARTIFACT_POSITION[1]))
-                if not player["got_artifact"]:
-                    if detectar_colision(player["hitbox"]["rct"], player["artifact_rect"]):
-                        player["got_artifact"] = True
-                        game["show_popup"] = True
-                        game["popup_start_time"] = pygame.time.get_ticks()
+            show_hud(SCREEN, player, font)
             
             new_playtime = playtime + pygame.time.get_ticks()
-            SCREEN.blit(player["heart_image"], (HEARTS_GUI_POSITION[0], HEARTS_GUI_POSITION[1]))
-            SCREEN.blit(stars_hud, (STARS_POSITION[0], STARS_POSITION[1]))
-            show_text(SCREEN, (STARS_POSITION[0] + 80, STARS_POSITION[1] + 25), f"{player["stars_count"]}", font, YELLOW)
+            endscreen(game, player, SCREEN)
             
-            if game["show_popup"]:
-                current_time = pygame.time.get_ticks()
-                if current_time - game["popup_start_time"] >= POPUP_DURATION:
-                    game["show_popup"] = False
-                    quit_game()
-                    break 
-                else:
-                    SCREEN.blit(gameover_popup, (0,0))
-            if player["got_artifact"]:
-                game["show_popup"] = True
             # Refresh screen
             pygame.display.flip()
+            

@@ -551,7 +551,7 @@ def game_flags():
     return {
     "playing_music": True,
     "in_pause": False,
-    "show_popup": True,
+    "show_popup": False,
     "playtime": 0,
     "game_over": False,
     "popup_start_time": 0
@@ -564,4 +564,30 @@ def show_star_popup(game, screen):
             game["show_popup"] = False
         else:
             screen.blit(popup_inv_star, (0,0))
+
+def artifact_appear_condition(trunk, trunk_2, rino, rino_2, rino_3, screen, player, game):
+    if not trunk["live"] and not trunk_2["live"] and not rino["live"] and not rino_2["live"] and not rino_3["live"]:
+        screen.blit(artifact_image, (ARTIFACT_POSITION[0], ARTIFACT_POSITION[1]))
+        if not player["got_artifact"]:
+            if detectar_colision(player["hitbox"]["rct"], player["artifact_rect"]):
+                player["got_artifact"] = True
+                game["show_popup"] = True
+                game["popup_start_time"] = pygame.time.get_ticks()
+
+def show_hud(screen, player, font):
+    get_health_image(player)
+    screen.blit(player["heart_image"], (HEARTS_GUI_POSITION[0], HEARTS_GUI_POSITION[1]))
+    screen.blit(stars_hud, (STARS_POSITION[0], STARS_POSITION[1]))
+    show_text(screen, (STARS_POSITION[0] + 80, STARS_POSITION[1] + 25), f"{player["stars_count"]}", font, YELLOW)
+
+def endscreen(game, player, screen):
+    if game["show_popup"]:
+        current_time = pygame.time.get_ticks()
+        if current_time - game["popup_start_time"] >= POPUP_DURATION:
+            game["show_popup"] = False
+            quit_game()
+        else:
+            screen.blit(gameover_popup, (0,0))
+    if player["got_artifact"]:
+        game["show_popup"] = True
 
