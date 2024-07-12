@@ -1,5 +1,7 @@
 import pygame
 import sys
+import csv
+import json
 from pygame.locals import *
 from settings import *
 from loads import *
@@ -58,21 +60,6 @@ def wait_user(key):
             if event.type == KEYDOWN:
                 if event.key == key:
                     flag_start_up = False
-
-def score_calculator(hearts, playtime, stars):
-    match hearts:
-        case 5:
-            score = stars * 15
-        case 4:
-            score = stars * 14
-        case 3:
-            score = stars * 13
-        case 2:
-            score = stars * 12
-        case 1:
-            score = stars * 11
-    final_score = score, playtime
-    return final_score
 
 # Level conditions
 def level_1_condition(trunk, rino, player):
@@ -351,6 +338,7 @@ def keyup_detection(event, player):
 def check_player_death(player, game):
     if player["hearts"] <= 0:
         game["game_over"] = True
+        save_score(player, game)
         return game["game_over"]
 
 def laser_hit_enemy(player, enemy):
@@ -598,9 +586,33 @@ def endscreen(game, player, screen):
         current_time = pygame.time.get_ticks()
         if current_time - game["popup_start_time"] >= POPUP_DURATION:
             game["show_popup"] = False
+            save_score(player, game)
             quit_game()
         else:
-            game["in_pause"] = True
             screen.blit(gameover_popup, (0,0))
+            game["in_pause"] = True
+
     if player["got_artifact"]:
         game["show_popup"] = True
+
+def score_calculator(player):
+    match player["hearts"]:
+        case 5:
+            score = player["stars_count"] * 16
+        case 4:
+            score = player["stars_count"] * 15
+        case 3:
+            score = player["stars_count"] * 14
+        case 2:
+            score = player["stars_count"] * 13
+        case 1:
+            score = player["stars_count"] * 12
+        case 0:
+            score = player["stars_count"] * 11
+    final_score = score
+    return final_score
+
+def save_score(player, game):
+    with open('./src/scores.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([player["score"], game["playtime"]])

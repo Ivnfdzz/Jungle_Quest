@@ -94,13 +94,15 @@ def level_1():
             
             
             game["playtime"] = pygame.time.get_ticks()
+            player["score"] = score_calculator(player)
             if level_1_condition(trunk, rino, player):
                 level_2(player, game)
             
             # Refresh screen
             pygame.display.flip()
+            print(game["playtime"])
 
-def level_2(past_player, game):
+def level_2(past_player, past_game):
     #level 2
     while True:
         # Player
@@ -120,7 +122,7 @@ def level_2(past_player, game):
         
         # Game
         game = game_flags()
-        new_playtime = game["playtime"]
+        game["playtime"] = past_game["playtime"]
 
         while True:
             clock.tick(FPS)
@@ -174,13 +176,15 @@ def level_2(past_player, game):
             # GUI
             show_hud(SCREEN, player, font)
             
-            new_playtime = game["playtime"] + pygame.time.get_ticks()
+            game["playtime"] += pygame.time.get_ticks()
+            player["score"] = score_calculator(player)
             if level_2_condition(trunk, rino, trunk_2, player):
-                level_3(player, new_playtime)
+                level_3(player, game)
             # Refresh screen
             pygame.display.flip()
+            print(game["playtime"])
 
-def level_3(past_player, playtime):
+def level_3(past_player, past_game):
     while True:
         # Player
         player = create_player(player_hearts= past_player["hearts"], heart_image= past_player["heart_image"],got_invulnerability_star= past_player["got_invulnerability_star"], stars_count= past_player["stars_count"], inv_star_used=past_player["inv_star_used"])
@@ -205,7 +209,7 @@ def level_3(past_player, playtime):
         
         # Game
         game = game_flags()
-        new_playtime = playtime
+        game["playtime"] = past_game["playtime"]
         # Game loop
         while True:
             clock.tick(FPS)
@@ -262,14 +266,16 @@ def level_3(past_player, playtime):
             show_hud(SCREEN, player, font)
             
             
-            new_playtime = playtime + pygame.time.get_ticks()
+            game["playtime"] += pygame.time.get_ticks()
+            player["score"] = score_calculator(player)
             if level_3_condition(trunk, rino, trunk_2, rino_2, rino_3, player):
-                level_4(player, new_playtime)
+                level_4(player, game)
             
             # Refresh screen
             pygame.display.flip()
+            print(game["playtime"])
 
-def level_4(past_player, playtime):
+def level_4(past_player, past_game):
     #level4
     while True:
         # Player
@@ -298,7 +304,7 @@ def level_4(past_player, playtime):
         
         # Game
         game = game_flags()
-        new_playtime = playtime
+        game["playtime"] = past_game["playtime"]
         
         # Game loop
         while True:
@@ -362,9 +368,8 @@ def level_4(past_player, playtime):
             get_health_image(player)
             show_hud(SCREEN, player, font)
             
-            new_playtime = playtime + pygame.time.get_ticks()
+            game["playtime"] += pygame.time.get_ticks()
+            player["score"] = score_calculator(player)
             endscreen(game, player, SCREEN)
-            
             # Refresh screen
             pygame.display.flip()
-            
