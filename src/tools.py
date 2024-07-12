@@ -130,7 +130,6 @@ def create_level_platforms(level):
             create_platform(0, SCREEN_HEIGHT - 80, SCREEN_WIDTH, 80, color=GREEN),
             create_platform(0, 220, 800, 1, color=RED),
             create_platform(0, 370, 800, 1, color=RED)]
-
     return platforms
 
 # Player
