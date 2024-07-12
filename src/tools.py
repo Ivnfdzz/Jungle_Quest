@@ -1,7 +1,6 @@
 import pygame
 import sys
 import csv
-import json
 from pygame.locals import *
 from settings import *
 from loads import *
@@ -492,11 +491,11 @@ def key_movement_detection(player:dict, event:pygame.event)-> None:
     player (dict): The player object.
     event (pygame.event.Event): The key event.
     """
-    if event.key == K_LEFT or event.key == K_a:
+    if event.key == K_a:
         player["move_left"] = True
         player["direction"] = "left"
 
-    if event.key == K_RIGHT or event.key == K_d:
+    if event.key == K_d:
         player["move_right"] = True
         player["direction"] = "right"
 
@@ -604,20 +603,25 @@ def keyup_detection(event:pygame.event, player:dict)-> None:
         if event.key == K_RIGHT or event.key == K_d:
             player["move_right"] = False
 
-def check_player_death(player:dict, game:dict)-> bool:
+def check_player_death(player:dict, game:dict, screen:pygame.Surface, font:pygame.font):
     """Checks if the player has died and handles game over.
 
     Args:
     player (dict): The player object.
     game (dict): The game object.
+    screen (pygame.Surface): The game screen
+    font (pygame.font): The game font
 
     Returns:
     bool: True if the game is over, False otherwise.
     """
     if player["hearts"] <= 0:
         game["game_over"] = True
-        save_score(player, game)
+        player["name"] = get_player_name(screen, font)
+        save_score(player)
         return game["game_over"]
+    return False
+
 
 def laser_hit_enemy(player:dict, enemy:dict)-> None:
     """Handles laser hits on enemies.
@@ -626,15 +630,18 @@ def laser_hit_enemy(player:dict, enemy:dict)-> None:
     player (dict): The player object.
     enemy (dict): The enemy object.
     """
-    if player["laser"]:
-        if detect_collition(player["laser"]["rct"], enemy["hitbox"]["rct"]):
-            enemy["live"] = None
-            player["laser"] = None
-            player["stars_count"] += 1
-            enemy_killed_sound.play()
-            player["visual_effect"] = item_feedback
-            player["visual_effect_start_time"] = pygame.time.get_ticks()
-            player["visual_effect_location"] = (enemy["hitbox"]["rct"].x, enemy["hitbox"]["rct"].y)
+    try:
+        if player["laser"]:
+            if detect_collition(player["laser"]["rct"], enemy["hitbox"]["rct"]):
+                enemy["live"] = None
+                player["laser"] = None
+                player["stars_count"] += 1
+                enemy_killed_sound.play()
+                player["visual_effect"] = item_feedback
+                player["visual_effect_start_time"] = pygame.time.get_ticks()
+                player["visual_effect_location"] = (enemy["hitbox"]["rct"].x, enemy["hitbox"]["rct"].y)
+    except KeyError as e:
+        print(f"KeyError: Missing key {e} in player or enemy dictionary")
 
 def get_health_image(player:dict)-> pygame.Surface:
     """Gets the appropriate health image based on the player's hearts.
@@ -1028,19 +1035,21 @@ def show_hud(screen:pygame.Surface, player:dict, font:pygame.font)-> None:
     screen.blit(stars_hud, (STARS_POSITION[0], STARS_POSITION[1]))
     show_text(screen, (STARS_POSITION[0] + 80, STARS_POSITION[1] + 25), f"{player["stars_count"]}", font, YELLOW)
 
-def endscreen(game:dict, player:dict, screen:pygame.Surface)-> None:
+def endscreen(game:dict, player:dict, screen:pygame.Surface, font:pygame.font)-> None:
     """Handles the end screen logic and display.
 
     Args:
     game (dict): The game object.
     player (dict): The player object.
     screen (pygame.Surface): The game screen.
+    font (pygame.font): The game font.
     """
     if game["show_popup"]:
         current_time = pygame.time.get_ticks()
         if current_time - game["popup_start_time"] >= POPUP_DURATION:
             game["show_popup"] = False
-            save_score(player, game)
+            player["name"] = get_player_name(screen, font)
+            save_score(player)
             quit_game()
         else:
             screen.blit(gameover_popup, (0,0))
@@ -1071,18 +1080,62 @@ def score_calculator(player:dict)-> int:
             score = player["stars_count"] * 12
         case 0:
             score = player["stars_count"] * 11
-    final_score = score
-    return final_score
+    return score
 
-def save_score(player:dict, game:dict)-> None:
+def save_score(player:dict)-> None:
     """
-    Saves the player's score and game playtime to a CSV file.
+    Saves the player's name and score to a CSV file.
 
     Args:
     player (dict): The player object.
-    game (dict): The game object.
     """
     with open('./src/scores.csv', 'a', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow([player["score"], game["playtime"]])
+        writer.writerow([player["name"], player["score"]])
 
+def get_player_name(screen:pygame.Surface, font:pygame.font):
+    """ Creates a text box in the center of the screen where the user can type
+    their name.
+
+    Args:
+        screen (pygame.Surface): The game screen
+        font (pygame.font): The font used to render the text on the screen.
+
+    Returns:
+        str: The name entered by the user.
+    """
+    input_box = pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 - 25, 200, 50)
+    color_inactive = pygame.Color('lightskyblue3')
+    color_active = pygame.Color('dodgerblue2')
+    color = color_inactive
+    active = False
+    text = ''
+    done = False
+
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit_game()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if input_box.collidepoint(event.pos):
+                    active = not active
+                else:
+                    active = False
+                color = color_active if active else color_inactive
+            if event.type == pygame.KEYDOWN:
+                if active:
+                    if event.key == pygame.K_RETURN:
+                        done = True
+                    elif event.key == pygame.K_BACKSPACE:
+                        text = text[:-1]
+                    else:
+                        text += event.unicode
+        screen.fill((30, 30, 30))
+        txt_surface = font.render(text, True, color)
+        width = max(200, txt_surface.get_width() + 10)
+        input_box.w = width
+        screen.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
+        pygame.draw.rect(screen, color, input_box, 2)
+        show_text(screen, (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 50), "Enter your name:", font, (255, 255, 255))
+        pygame.display.flip()
+    return text

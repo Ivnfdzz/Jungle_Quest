@@ -45,9 +45,6 @@ def load_scaled_image(file_name:str, width:int, height:int)-> pygame.Surface:
 
     Returns:
     pygame.Surface: The loaded and scaled image.
-
-    Raises:
-    pygame.error: If the image cannot be loaded.
     """
     image = pygame.image.load(file_name)
     image = pygame.transform.scale(image, (width, height))

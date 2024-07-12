@@ -1,13 +1,59 @@
 import pygame
 import sys
-import csv 
 import json
+import os
+
 from settings import *
 from loads import *
 from tools import *
 from main import level_1
 
+# Ruta del archivo de configuración
+config_path = os.path.join("src", "config.json")
+csv_path = os.path.join("src", "scores.csv")
 
+# Leer configuración de JSON
+def load_config():
+    if os.path.exists(config_path):
+        with open(config_path, "r") as file:
+            return json.load(file)
+    else:
+        return {"music_playing": True}  # Valor predeterminado
+
+# Guardar configuración en JSON
+def save_config(config):
+    with open(config_path, "w") as file:
+        json.dump(config, file, indent=4)
+
+def load_scores():
+    scores = []
+    if os.path.exists(csv_path):
+        with open(csv_path, newline='') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                if len(row) >= 2:  # Verifica que la fila tenga al menos dos elementos
+                    try:
+                        scores.append((row[0], int(row[1])))  # Asume que el CSV tiene nombre y puntaje
+                    except ValueError:
+                        print(f"Error converting score to int for row: {row}")
+                else:
+                    print(f"Row has insufficient elements: {row}")
+
+    # Ordenar los puntajes de mayor a menor
+    scores.sort(key=lambda x: x[1], reverse=True)
+    
+    # Limitar a los 10 puntajes más altos
+    return scores[:10]
+
+def display_scores(scores):
+    y_offset = 200  # Ajusta esta variable según la posición en la pantalla donde quieres empezar a mostrar los puntajes
+    for i, (name, score) in enumerate(scores):
+        text = f"{i+1}. {name}: {score}"
+        text_surf = font.render(text, True, GREEN)
+        SCREEN.blit(text_surf, (SCREEN_WIDTH // 2 - text_surf.get_width() // 2, y_offset))
+        y_offset += 30  # Ajusta el espaciado entre los puntajes
+
+# Inicializar pygame y otras configuraciones
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Jungle Quest")
 pygame.display.set_icon(pygame.image.load("./src/assets/images/gui/icon.png"))
@@ -16,15 +62,26 @@ pygame.init()
 pygame.mixer.init()
 font = pygame.font.SysFont("Daydream", 25)
 
-music_playing = True
+# Cargar configuración
+config = load_config()
+music_playing = config.get("music_playing", True)
+
+if music_playing:
+    pygame.mixer.music.play(-1)
+else:
+    pygame.mixer.music.pause()
 
 def toggle_music():
     global music_playing
-    if music_playing:
-        pygame.mixer.music.pause()
-    else:
-        pygame.mixer.music.unpause()
     music_playing = not music_playing
+    if music_playing:
+        pygame.mixer.music.unpause()
+    else:
+        pygame.mixer.music.pause()
+
+    # Actualizar configuración en JSON
+    config["music_playing"] = music_playing
+    save_config(config)
 
 # Función para dibujar un botón con imagen centrado
 def draw_image_button(image, center_pos, action=None):
@@ -100,20 +157,29 @@ def play_scenario():
         pygame.display.flip()
 
 def leaderboards_screen():
+    scores = load_scores()
     while True:
-        SCREEN.blit(menu_background, (0,0))
+        SCREEN.blit(menu_background, (0, 0))
         mouse_over_button = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit_game()
-        text_surf = font.render("SCREEN 2", True, BLACK)
-        SCREEN.blit(text_surf, (SCREEN_WIDTH // 2 - text_surf.get_width() // 2, SCREEN_HEIGHT // 2 - text_surf.get_height() // 2))
+        
+        # Título de la pantalla de puntajes
+        text_surf = font.render("Leaderboards", True, GREEN)
+        SCREEN.blit(text_surf, (SCREEN_WIDTH // 2 - text_surf.get_width() // 2, 50))
+        
+        # Mostrar puntajes
+        display_scores(scores)
+        
+        # Botón de volver al menú principal
         if draw_image_button(back_button, (50, 50), main_menu):
             mouse_over_button = True
         if mouse_over_button:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
         else:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+        
         pygame.display.flip()
 
 def options_screen():
@@ -137,7 +203,6 @@ def options_screen():
         else:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         pygame.display.flip()
-
 
 def gameover_screen():
     while True:

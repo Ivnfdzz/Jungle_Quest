@@ -8,9 +8,7 @@ pygame.mixer.init()
 
 # Screen config
 SCREEN = pygame.display.set_mode(SCREEN_SIZE)
-# Window title
-pygame.display.set_caption('Jungle Quest')
-pygame.display.set_icon(pygame.image.load("./src/assets/images/gui/icon.png"))
+
 clock = pygame.time.Clock()
 # Font settings
 font = pygame.font.SysFont("Daydream", 30)
@@ -61,7 +59,7 @@ def level_1():
                 SCREEN.blit(fail_gameover_popup, (0, 0))
                 pygame.display.flip()
                 continue
-
+            
             for event in pygame.event.get():
                 if event.type == QUIT:
                     quit_game()
@@ -71,10 +69,10 @@ def level_1():
                     
                 # Release keys detection
                 keyup_detection(event, player)
-
+            
             # Player
             launch_player_events(player, platforms, SCREEN)
-            game["game_over"] = check_player_death(player, game)
+            game["game_over"] = check_player_death(player, game, SCREEN, font)
             
             SCREEN.blit(level_1_background, (0, 0))
             #Rino enemy:
@@ -92,17 +90,14 @@ def level_1():
             # GUI
             show_hud(SCREEN, player, font)
             
-            
-            game["playtime"] = pygame.time.get_ticks()
             player["score"] = score_calculator(player)
             if level_1_condition(trunk, rino, player):
-                level_2(player, game)
+                level_2(player)
             
             # Refresh screen
             pygame.display.flip()
-            print(game["playtime"])
 
-def level_2(past_player, past_game):
+def level_2(past_player):
     #level 2
     while True:
         # Player
@@ -122,7 +117,6 @@ def level_2(past_player, past_game):
         
         # Game
         game = game_flags()
-        game["playtime"] = past_game["playtime"]
 
         while True:
             clock.tick(FPS)
@@ -150,7 +144,7 @@ def level_2(past_player, past_game):
 
             launch_player_events(player, platforms, SCREEN)
             
-            game["game_over"] = check_player_death(player, game)
+            game["game_over"] = check_player_death(player, game, SCREEN, font)
             
             SCREEN.blit(level_2_background, (0, 0))
             
@@ -176,15 +170,13 @@ def level_2(past_player, past_game):
             # GUI
             show_hud(SCREEN, player, font)
             
-            game["playtime"] += pygame.time.get_ticks()
             player["score"] = score_calculator(player)
             if level_2_condition(trunk, rino, trunk_2, player):
-                level_3(player, game)
+                level_3(player)
             # Refresh screen
             pygame.display.flip()
-            print(game["playtime"])
 
-def level_3(past_player, past_game):
+def level_3(past_player):
     while True:
         # Player
         player = create_player(player_hearts= past_player["hearts"], heart_image= past_player["heart_image"],got_invulnerability_star= past_player["got_invulnerability_star"], stars_count= past_player["stars_count"], inv_star_used=past_player["inv_star_used"])
@@ -209,7 +201,7 @@ def level_3(past_player, past_game):
         
         # Game
         game = game_flags()
-        game["playtime"] = past_game["playtime"]
+
         # Game loop
         while True:
             clock.tick(FPS)
@@ -236,7 +228,7 @@ def level_3(past_player, past_game):
                 keyup_detection(event, player)
 
             launch_player_events(player, platforms, SCREEN)
-            game["game_over"] = check_player_death(player, game)
+            game["game_over"] = check_player_death(player, game, SCREEN, font)
             
             # Showing images and animations
             SCREEN.blit(level_3_background, (0, 0))
@@ -265,17 +257,14 @@ def level_3(past_player, past_game):
             # GUI
             show_hud(SCREEN, player, font)
             
-            
-            game["playtime"] += pygame.time.get_ticks()
             player["score"] = score_calculator(player)
             if level_3_condition(trunk, rino, trunk_2, rino_2, rino_3, player):
-                level_4(player, game)
+                level_4(player)
             
             # Refresh screen
             pygame.display.flip()
-            print(game["playtime"])
 
-def level_4(past_player, past_game):
+def level_4(past_player):
     #level4
     while True:
         # Player
@@ -304,7 +293,6 @@ def level_4(past_player, past_game):
         
         # Game
         game = game_flags()
-        game["playtime"] = past_game["playtime"]
         
         # Game loop
         while True:
@@ -333,7 +321,7 @@ def level_4(past_player, past_game):
 
             launch_player_events(player, platforms, SCREEN)
             
-            game["game_over"] = check_player_death(player, game)
+            game["game_over"] = check_player_death(player, game, SCREEN, font)
             
             # Showing images and animations
             SCREEN.blit(level_4_background, (0, 0))
@@ -365,11 +353,9 @@ def level_4(past_player, past_game):
             artifact_appear_condition(trunk, trunk_2, rino, rino_2, rino_3, SCREEN, player, game)
             
             # GUI
-            get_health_image(player)
             show_hud(SCREEN, player, font)
             
-            game["playtime"] += pygame.time.get_ticks()
             player["score"] = score_calculator(player)
-            endscreen(game, player, SCREEN)
+            endscreen(game, player, SCREEN, font)
             # Refresh screen
             pygame.display.flip()
