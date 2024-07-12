@@ -91,3 +91,19 @@ inv_star_shield = load_scaled_image("./src/assets/images/sprites/invulnerability
 # Items
 invulnerability_star_animation, _ = load_animation("./src/assets/images/sprites/invulnerability_star/invulnerability_star_", "png", 4, INVULNERABILITY_STAR_SIZE[0], INVULNERABILITY_STAR_SIZE[1])
 artifact_image = load_scaled_image("./src/assets/images/sprites/artifact.png", ARTIFACT_SIZE[0], ARTIFACT_SIZE[1])
+
+# SFX
+
+# Menu:
+start_button_sound = pygame.mixer.Sound("./src/assets/sounds/fx/menu/Start.wav")
+press_button_sound = pygame.mixer.Sound("./src/assets/sounds/fx/menu/UI_1.wav")
+
+# Game:
+enemy_killed_sound = pygame.mixer.Sound("./src/assets/sounds/fx/game/enemy_hit.wav")
+inv_star_popup_sound = pygame.mixer.Sound("./src/assets/sounds/fx/game/inv_star_popup_sound.wav")
+inv_star_use_sound = pygame.mixer.Sound("./src/assets/sounds/fx/game/inv_star_use_sound.wav")
+player_hit_sound = pygame.mixer.Sound("./src/assets/sounds/fx/game/player_hit.wav")
+player_jump_sound = pygame.mixer.Sound("./src/assets/sounds/fx/game/player_jump.wav")
+player_laser_sound = pygame.mixer.Sound("./src/assets/sounds/fx/game/player_laser.wav")
+trunk_shoot_sound = pygame.mixer.Sound("./src/assets/sounds/fx/game/trunk_shoot_sound.wav")
+rino_hit_player_sound = pygame.mixer.Sound("./src/assets/sounds/fx/game/rino_hit_player.wav")

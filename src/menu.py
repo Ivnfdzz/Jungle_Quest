@@ -38,12 +38,15 @@ def draw_image_button(image, center_pos, action=None):
     return hovered
 
 def go_to_game():
+    start_button_sound.play()
     level_1()
 
 def go_to_leaderboards():
+    press_button_sound.play()
     leaderboards_screen()
 
 def go_to_options():
+    press_button_sound.play()
     options_screen()
 
 def quit_game():
@@ -112,7 +115,7 @@ def leaderboards_screen():
         pygame.display.flip()
 
 def options_screen():
-    global music_playing  # Asegurar el uso de la variable global
+    global music_playing
     while True:
         SCREEN.blit(menu_background, (0, 0))
         mouse_over_button = False

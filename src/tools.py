@@ -269,10 +269,12 @@ def key_space_detection(player, game, event):
             game["show_popup"] = False
         if player["on_ground"]:
             player["vel_y"] = -JUMP_STRENGTH
+            player_jump_sound.play()
             player["on_ground"] = False
         elif not player["double_jump_used"]:
             player["vel_y"] = -JUMP_2_STRENGTH
             player["double_jump_used"] = True
+            player_jump_sound.play()
 
 def key_movement_detection(player, event):
     if event.key == K_LEFT or event.key == K_a:
@@ -308,6 +310,7 @@ def key_shoot_detection(player, event):
             player["shooting_timer"] = pygame.time.get_ticks()
             player["laser"] = create_laser(player["hitbox"]["rct"].midright if player["direction"] == "right" else player["hitbox"]["rct"].midleft)
             player["laser_direction"] = player["direction"]
+            player_laser_sound.play()
 
 def key_inv_star_detection(player, event):
     if event.key == K_x:
@@ -316,6 +319,7 @@ def key_inv_star_detection(player, event):
                 player["inv_star_on"] = True
                 player["star_invulnerability_start_time"] = pygame.time.get_ticks()
                 player["inv_star_used"] = True
+                inv_star_use_sound.play()
 
 def keydown_detection(event, player, game, screen, font):
     if event.type == KEYDOWN:
@@ -355,7 +359,7 @@ def laser_hit_enemy(player, enemy):
             enemy["live"] = None
             player["laser"] = None
             player["stars_count"] += 1
-            
+            enemy_killed_sound.play()
             player["visual_effect"] = item_feedback
             player["visual_effect_start_time"] = pygame.time.get_ticks()
             player["visual_effect_location"] = (enemy["hitbox"]["rct"].x, enemy["hitbox"]["rct"].y)
@@ -426,6 +430,7 @@ def rino_hit_player(player, rino):
         if not player["hit_invulnerability"]:
             if detectar_colision(player["hitbox"]["rct"], rino["hitbox"]["rct"]):
                 player["hearts"] -= 1
+                rino_hit_player_sound.play()
                 if rino["direction"] == "left":
                     player["hitbox"]["rct"].x += 20
                 else:
@@ -463,6 +468,7 @@ def trunk_sees_player(player, trunk):
         # Setting a time between each trunk's shoot and creating the shoot
         if pygame.time.get_ticks() - trunk["last_shoot_time"] > TRUNK_SHOOT_TIME:
             trunk["last_shoot_time"] = pygame.time.get_ticks()
+            trunk_shoot_sound.play()
             if trunk["direction"] == "left":
                 trunk["bullet"] = create_laser(trunk["hitbox"]["rct"].midleft, color=YELLOW)
             else:
@@ -482,6 +488,7 @@ def trunk_shooting(trunk, player):
         if not player["inv_star_on"] and not player["hit_invulnerability"]:
             if detectar_colision(player["hitbox"]["rct"], trunk["bullet"]["rct"]):
                 player["hearts"] -= 1
+                player_hit_sound.play()
                 trunk["bullet"] = None
                 return  # Exit the function early after collision
         
@@ -555,7 +562,8 @@ def game_flags():
     "show_popup": False,
     "playtime": 0,
     "game_over": False,
-    "popup_start_time": 0
+    "popup_start_time": 0,
+    "sound_played": False
     }
 
 def show_star_popup(game, screen):
@@ -563,8 +571,12 @@ def show_star_popup(game, screen):
         current_time = pygame.time.get_ticks()
         if current_time - game["popup_start_time"] >= POPUP_DURATION:
             game["show_popup"] = False
+            game["sound_played"] = False
         else:
             screen.blit(popup_inv_star, (0,0))
+            if not game["sound_played"]:
+                inv_star_popup_sound.play()
+                game["sound_played"] = True
 
 def artifact_appear_condition(trunk, trunk_2, rino, rino_2, rino_3, screen, player, game):
     if not trunk["live"] and not trunk_2["live"] and not rino["live"] and not rino_2["live"] and not rino_3["live"]:
@@ -592,4 +604,3 @@ def endscreen(game, player, screen):
             screen.blit(gameover_popup, (0,0))
     if player["got_artifact"]:
         game["show_popup"] = True
-
