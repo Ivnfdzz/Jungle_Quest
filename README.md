@@ -2,6 +2,7 @@
 
 ¡Bienvenido a **Jungle Quest**!  
 Un juego de aventuras 2D desarrollado con **Pygame**, donde tomás el rol de un astronauta perdido en una jungla alienígena, enfrentando peligros y buscando una salida antes de que sea demasiado tarde.
+![Level_1](https://github.com/Ivnfdzz/Jungle_Quest/blob/d4e3ba1fc01eec9c09a2aeb2d2e165b45276a5fc/src/assets/readme/level_1.png)
 
 ---
 
@@ -15,16 +16,19 @@ Tu misión: **sobrevivir, esquivar enemigos, encontrar el Artefacto y salir en u
 
 ## 🐍 Enemigos
 
-- **Trunk:**  
+- **Trunk: ![Trunk](https://github.com/Ivnfdzz/Jungle_Quest/blob/d4e3ba1fc01eec9c09a2aeb2d2e165b45276a5fc/src/assets/readme/trunk.png)**  
   Un tronco que dispara rayos láser a intervalos. Ideal para mantenerte en movimiento.
-- **Rino:**  
+  
+- **Rino: ![Rino](https://github.com/Ivnfdzz/Jungle_Quest/blob/d4e3ba1fc01eec9c09a2aeb2d2e165b45276a5fc/src/assets/readme/Rino.png)**  
   Un rinoceronte imparable que embiste de derecha a izquierda arrasando con todo.
+
+*Cada enemigo derrotado sumara una estrella al puntaje*
 
 ---
 
 ## 🌌 Power-ups
 
-- **Estrella de invulnerabilidad:**  
+- **Estrella de invulnerabilidad: ![inv_star](https://github.com/Ivnfdzz/Jungle_Quest/blob/d4e3ba1fc01eec9c09a2aeb2d2e165b45276a5fc/src/assets/readme/invulnerability_star.png)**  
   Si la encontras, la podes usar para volverte invulnerable por unos segundos. Puede marcar la diferencia entre la victoria o el reinicio.
 
 ---
@@ -78,10 +82,10 @@ Completamente hecho en solitario en aproximadamente 2 semanas.
 
 ### 🏁 Planes a futuro
 
-**Corrección** de bugs menores
-**Mejora** en la **movilidad** del jugador
-**Mejora** en el sistema de puntuación
-Posible **expansión** con nuevos enemigos, historia o mecánicas
+- **Corrección** de bugs menores
+- **Mejora** en la **movilidad** del jugador
+- **Mejora** en el sistema de puntuación
+- Posible **expansión** con nuevos enemigos, historia o mecánicas
 
 ---
 
