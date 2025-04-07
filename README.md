@@ -69,7 +69,7 @@ Includes background music that can be **turned on or off** from the settings men
   Only **Pygame**
 - **tools.py:**  
   It's the **game engine**. Controls collisions, player and enemy movement, lives system, power-ups and more.
-- **main.py:**  
+- **levels.py:**  
   Orchestrates the levels using the functions of `tools.py` as if they were pieces of a big puzzle. Each level is a function like `level_1()`.
 
 ---
