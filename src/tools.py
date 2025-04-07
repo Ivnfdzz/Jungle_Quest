@@ -26,8 +26,7 @@ def point_in_rectangle(punto:tuple, rect:pygame.Rect)-> bool:
     return x >= rect.left and x <= rect.right and y >= rect.top and y <= rect.bottom
 
 def detect_collition(rect_1:pygame.Rect, rect_2:pygame.Rect)-> bool:
-    """DEL PROFE
-    Detects collision between two rectangles.
+    """Detects collision between two rectangles.
 
     Args:
     rect_1 (pygame.Rect): The first rectangle.
@@ -42,8 +41,7 @@ def detect_collition(rect_1:pygame.Rect, rect_2:pygame.Rect)-> bool:
         return False
 
 def show_text(superficie: pygame.Surface, coordenada: tuple[int, int], texto: str, fuente: pygame.font.Font, color: tuple[int, int, int] = (255, 255, 255), background_color: tuple[int, int, int] = None)-> None:
-    """DEL PROFE:
-    Displays text on a surface.
+    """Displays text on a surface.
 
     Args:
     superficie (pygame.Surface): The surface to draw on.
@@ -59,8 +57,7 @@ def show_text(superficie: pygame.Surface, coordenada: tuple[int, int], texto: st
     pygame.display.flip()
 
 def create_block(left=0, top=0, width=50, height=50, color=(255, 255, 255), dir=3, borde=0, radio=-1, vel_y=0, on_ground= True, double_jump_used=False)-> dict:
-    """DEL PROFE:
-    Creates a block with specified properties.
+    """Creates a block with specified properties.
 
     Args:
     imagen (pygame.Surface, optional): The image for the block. Defaults to None.
@@ -141,8 +138,7 @@ def create_laser(midRight: tuple[int, int], color: tuple[int, int, int] = (255, 
     return block
 
 def wait_user(key)-> None:
-    """DEL PROFE:
-    Waits for the user to press a specific key.
+    """Waits for the user to press a specific key.
 
     Args:
     key: The key to wait for.
