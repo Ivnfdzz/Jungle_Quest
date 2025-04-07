@@ -116,7 +116,7 @@ source venv/bin/activate
 
 ### 4. Instalá pygame:
 ```
-pip install pygame
+pip install -r requirements.txt
 ```
 
 ### 5. Ejecutá el juego:
