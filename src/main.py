@@ -1,361 +1,204 @@
 import pygame
+import sys
+import json
+import os
 from settings import *
-from tools import *
 from loads import *
+from tools import *
+from levels import level_1
+
+# Paths to configuration and scores files
+config_path = os.path.join("src", "config.json")
+csv_path = os.path.join("src", "scores.csv")
+
+# Function to load the configuration from a JSON file
+def load_config():
+    # Cheks if config file exists
+    if os.path.exists(config_path):
+        # Read the json file
+        with open(config_path, "r") as file:
+            return json.load(file)
+    else:
+        # Default config
+        return {"music_playing": True}
+
+# Function to save the configuration to a JSON file
+def save_config(config):
+    with open(config_path, "w") as file:
+        json.dump(config, file, indent=4)
+
+# load scores from a CSV file and sort them
+def load_scores():
+    # Return list
+    scores = []
+    # Check if the csv file exists
+    if os.path.exists(csv_path):
+        # Open csv file on read mode
+        with open(csv_path, newline='') as csvfile:
+            # Saves the content in the csv
+            reader = csv.reader(csvfile)
+            for row in reader:
+                # Check if exists at least a score
+                if len(row) >= 2:
+                    try:
+                        # Saves the score as a tuple
+                        scores.append((row[0], int(row[1])))
+                    except ValueError:
+                        # If row 2 is not a number prints an error
+                        print(f"Error converting score to int for row: {row}")
+                else:
+                    # If there is not enough elements in the row
+                    print(f"Row has insufficient elements: {row}")
+    # Based on the second tuple's element (score), sorts the list 
+    scores.sort(key=lambda x: x[1], reverse=True)
+    # Return the best 10 scores
+    return scores[:10]
+
+
+def display_scores(scores):
+    # Y position    
+    y_offset = 200 
+    for i, (name, score) in enumerate(scores):
+        text = f"{i+1}. {name}: {score}"
+        text_surf = font.render(text, True, GREEN)
+        SCREEN.blit(text_surf, (SCREEN_WIDTH // 2 - text_surf.get_width() // 2, y_offset))
+        y_offset += 30
+
+# Initialize the main screen and other Pygame settings
+SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Jungle Quest")
+pygame.display.set_icon(pygame.image.load("./src/assets/images/gui/icon.png"))
 
 pygame.init()
 pygame.mixer.init()
+font = pygame.font.SysFont("Daydream", 25)
 
-# Screen config
-SCREEN = pygame.display.set_mode(SCREEN_SIZE)
+# Load the configuration and set the music playing state
+config = load_config()
+music_playing = config.get("music_playing", True)
 
-clock = pygame.time.Clock()
-# Font settings
-font = pygame.font.SysFont("Daydream", 30)
-pygame.mixer_music.play()
+if music_playing:
+    pygame.mixer.music.play(-1)
+else:
+    pygame.mixer.music.pause()
 
-def level_1():
-    #level1
+# Function to toggle the music playing state
+def toggle_music():
+    global music_playing
+    music_playing = not music_playing
+    if music_playing:
+        pygame.mixer.music.unpause()
+    else:
+        pygame.mixer.music.pause()
+    config["music_playing"] = music_playing
+    save_config(config)
+
+# Function to draw a button with an image and handle its click action
+def draw_image_button(image, center_pos, action=None):
+    rect = image.get_rect(center=center_pos)
+    mouse_pos = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+    hovered = rect.collidepoint(mouse_pos)
+    SCREEN.blit(image, rect.topleft)
+    if hovered and click[0] == 1 and action:
+        pygame.time.delay(200)
+        action()
+    return hovered
+
+# Function to start the game
+def go_to_game():
+    start_button_sound.play()
+    level_1()
+
+# Function to display the leaderboards screen
+def go_to_leaderboards():
+    press_button_sound.play()
+    leaderboards_screen()
+
+# Function to display the options screen
+def go_to_options():
+    press_button_sound.play()
+    options_screen()
+
+# Function to quit the game
+def quit_game():
+    pygame.quit()
+    sys.exit()
+
+# Main menu function to display the main menu and handle navigation
+def main_menu():
     while True:
-        # Player
-        player = create_player()
-        
-        # Enemy "trunk"
-        trunk = create_trunk(1, "left")
-        
-        # Enemy "rino"
-        rino = create_rino(1, "left")
-        
-        # Map
-        platforms = create_level_platforms(1)
-        
-        # Game
-        game = game_flags()
-        game["show_popup"] = True
-        
-        # Game loop
-        while True:
-            clock.tick(FPS)
-            # Event detection
-            if not game["game_over"]:
-                if game["show_popup"]:
-                    for event in pygame.event.get():
-                        if event.type == QUIT:
-                            quit_game()
-                        if event.type == KEYDOWN and event.key == K_SPACE:
-                            game["show_popup"] = False
-                    SCREEN.blit(start_popup, (0, 0))
-                    pygame.display.flip()
-                    continue 
-            
-            if game["game_over"]:
-                game["show_popup"] = True
-                for event in pygame.event.get():
-                    if event.type == QUIT:
-                        quit_game()
-                    if event.type == KEYDOWN and event.key == K_SPACE:
-                        game["show_popup"] = False
-                        level_1()
-                SCREEN.blit(fail_gameover_popup, (0, 0))
-                pygame.display.flip()
-                continue
-            
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    quit_game()
-                
-                # Press keys detection
-                keydown_detection(event, player, game, SCREEN, font, platforms)
-                    
-                # Release keys detection
-                keyup_detection(event, player)
-            
-            # Player
-            launch_player_events(player, platforms, SCREEN)
-            game["game_over"] = check_player_death(player, game, SCREEN, font)
-            
-            SCREEN.blit(level_1_background, (0, 0))
-            #Rino enemy:
-            launch_rino_events(rino, player, SCREEN, 1)
-            
-            # Trunk enemy
-            launch_trunk_events(trunk, player, SCREEN)
-            
-            # Player animation
-            show_animation(SCREEN, player["animation"], 10, player["hitbox"]["rct"].x, player["hitbox"]["rct"].y)
-            
-            # Drawings
-            launch_drawing_events(player, SCREEN, trunk, game, font)
-            
-            # GUI
-            show_hud(SCREEN, player, font)
-            
-            player["score"] = score_calculator(player)
-            if level_1_condition(trunk, rino, player):
-                level_2(player)
-            
-            # Refresh screen
-            pygame.display.flip()
+        SCREEN.blit(main_menu_background, (0, 0))
+        mouse_over_button = False
 
-def level_2(past_player):
-    #level 2
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit_game()
+
+        if draw_image_button(play_button, (MID_SCREEN_WIDTH, 220), go_to_game):
+            mouse_over_button = True
+        if draw_image_button(leaderboard_button, (MID_SCREEN_WIDTH, 330), go_to_leaderboards):
+            mouse_over_button = True
+        if draw_image_button(options_button, (MID_SCREEN_WIDTH, 440), go_to_options):
+            mouse_over_button = True
+        if draw_image_button(quit_button, (MID_SCREEN_WIDTH, 550), quit_game):
+            mouse_over_button = True
+
+        if mouse_over_button:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+        else:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+        pygame.display.flip()
+
+# Display the leaderboards screen
+def leaderboards_screen():
+    scores = load_scores()
     while True:
-        # Player
-        player = create_player(player_hearts= past_player["hearts"], heart_image= past_player["heart_image"],got_invulnerability_star= False, stars_count= past_player["stars_count"])
+        SCREEN.blit(menu_background, (0, 0))
+        mouse_over_button = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit_game()
         
-        # Enemy "trunk"
-        trunk = create_trunk(2, "left")
+        text_surf = font.render("Leaderboards", True, GREEN)
+        SCREEN.blit(text_surf, (SCREEN_WIDTH // 2 - text_surf.get_width() // 2, 50))
         
-        # Enemy "trunk 2"
-        trunk_2 = create_trunk(3, "right")
+        display_scores(scores)
         
-        # Enemy "rino"
-        rino = create_rino(2, "left")
+        if draw_image_button(back_button, (50, 50), main_menu):
+            mouse_over_button = True
+        if mouse_over_button:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+        else:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         
-        # Map
-        platforms = create_level_platforms(2)
-        
-        # Game
-        game = game_flags()
+        pygame.display.flip()
 
-        while True:
-            clock.tick(FPS)
-            
-            if game["game_over"]:
-                game["show_popup"] = True
-                for event in pygame.event.get():
-                    if event.type == QUIT:
-                        quit_game()
-                    if event.type == KEYDOWN and event.key == K_SPACE:
-                        game["show_popup"] = False
-                        level_1()
-                SCREEN.blit(fail_gameover_popup, (0, 0))
-                pygame.display.flip()
-                continue
-            
-            # Event detection
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    quit_game()
-                
-                keydown_detection(event, player, game, SCREEN, font, platforms)
-                # Release keys detection
-                keyup_detection(event, player)
-
-            launch_player_events(player, platforms, SCREEN)
-            
-            game["game_over"] = check_player_death(player, game, SCREEN, font)
-            
-            SCREEN.blit(level_2_background, (0, 0))
-            
-            #Rino enemy:
-            launch_rino_events(rino, player, SCREEN, 2)
-            
-            # Trunk enemy
-            launch_trunk_events(trunk, player, SCREEN)
-            
-            # trunk_2 enemy
-            launch_trunk_events(trunk_2, player, SCREEN)
-            
-            # Player animation
-            show_animation(SCREEN, player["animation"], 10, player["hitbox"]["rct"].x, player["hitbox"]["rct"].y)
-            
-            # Drawings
-            launch_drawing_events(player, SCREEN, [trunk, trunk_2], game, font)
-            
-            # Invulnerability star
-            display_and_check_invulnerability_star(player, SCREEN, game)
-            show_star_popup(game, SCREEN)
-            
-            # GUI
-            show_hud(SCREEN, player, font)
-            
-            player["score"] = score_calculator(player)
-            if level_2_condition(trunk, rino, trunk_2, player):
-                level_3(player)
-            # Refresh screen
-            pygame.display.flip()
-
-def level_3(past_player):
+# Display the options screen
+def options_screen():
+    global music_playing
+    # Game loop
     while True:
-        # Player
-        player = create_player(player_hearts= past_player["hearts"], heart_image= past_player["heart_image"],got_invulnerability_star= past_player["got_invulnerability_star"], stars_count= past_player["stars_count"], inv_star_used=past_player["inv_star_used"])
-        
-        # Enemy "trunk"
-        trunk = create_trunk(4, "left")
-        
-        # Enemy "trunk 2"
-        trunk_2 = create_trunk(5, "right")
-        
-        # Enemy "rino"
-        rino = create_rino(3, "left")
-        
-        # Enemy "rino 2"
-        rino_2 = create_rino(4, "left")
-        
-        # Enemy "rino_3"
-        rino_3 = create_rino(5, "right")
-        
-        # Map
-        platforms = create_level_platforms(3)
-        
-        # Game
-        game = game_flags()
+        SCREEN.blit(menu_background, (0, 0))
+        mouse_over_button = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit_game()
+        # Title
+        text_surf = font.render("Options", True, GREEN)
+        SCREEN.blit(text_surf, (SCREEN_WIDTH // 2 - text_surf.get_width() // 2, 150 - text_surf.get_height() // 2 - 100))
+        # Back button
+        if draw_image_button(back_button, (50, 50), main_menu):
+            mouse_over_button = True
 
-        # Game loop
-        while True:
-            clock.tick(FPS)
-            
-            if game["game_over"]:
-                game["show_popup"] = True
-                for event in pygame.event.get():
-                    if event.type == QUIT:
-                        quit_game()
-                    if event.type == KEYDOWN and event.key == K_SPACE:
-                        game["show_popup"] = False
-                        level_1()
-                SCREEN.blit(fail_gameover_popup, (0, 0))
-                pygame.display.flip()
-                continue
-            
-            # Event detection
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    quit_game()
-                
-                keydown_detection(event, player, game, SCREEN, font, platforms)
-                # Release keys detection
-                keyup_detection(event, player)
+        # Mute button
+        if draw_image_button(mute_button, (MID_SCREEN_WIDTH, MID_SCREEN_HEIGHT), toggle_music):
+            mouse_over_button = True
+        # Change cursor
+        if mouse_over_button:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+        else:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+        pygame.display.flip()
 
-            launch_player_events(player, platforms, SCREEN)
-            game["game_over"] = check_player_death(player, game, SCREEN, font)
-            
-            # Showing images and animations
-            SCREEN.blit(level_3_background, (0, 0))
-            
-            # Trunk enemy
-            launch_trunk_events(trunk, player, SCREEN)
-            
-            # Trunk 2 enemy
-            launch_trunk_events(trunk_2, player, SCREEN)
-            
-            #Rino enemy:
-            launch_rino_events(rino, player, SCREEN, 3)
-            
-            #Rino enemy:
-            launch_rino_events(rino_2, player, SCREEN, 4)
-            
-            #Rino enemy:
-            launch_rino_events(rino_3, player, SCREEN, 5)
-            
-            # Player animation
-            show_animation(SCREEN, player["animation"], 10, player["hitbox"]["rct"].x, player["hitbox"]["rct"].y)
-            
-            # Draw the player laser
-            launch_drawing_events(player, SCREEN, [trunk, trunk_2], game, font)
-            
-            # GUI
-            show_hud(SCREEN, player, font)
-            
-            player["score"] = score_calculator(player)
-            if level_3_condition(trunk, rino, trunk_2, rino_2, rino_3, player):
-                level_4(player)
-            
-            # Refresh screen
-            pygame.display.flip()
-
-def level_4(past_player):
-    #level4
-    while True:
-        # Player
-        player = create_player(player_hearts= past_player["hearts"], heart_image= past_player["heart_image"],got_invulnerability_star= past_player["got_invulnerability_star"], stars_count= past_player["stars_count"], inv_star_used=past_player["inv_star_used"])
-        
-        # Enemy "rino"
-        rino = create_rino(6, "left")
-        
-        # Enemy "rino 2"
-        rino_2 = create_rino(7, "left")
-        
-        # Enemy "rino_3"
-        rino_3 = create_rino(8, "right")
-        
-        # Enemy "rino_4"
-        rino_4 = create_rino(9, "left")
-        
-        # Enemy "trunk"
-        trunk = create_trunk(6, "left")
-        
-        # Enemy "trunk 2"
-        trunk_2 = create_trunk(7, "right")
-        
-        # Map
-        platforms = create_level_platforms(4)
-        
-        # Game
-        game = game_flags()
-        
-        # Game loop
-        while True:
-            clock.tick(FPS)
-            
-            if game["game_over"]:
-                game["show_popup"] = True
-                for event in pygame.event.get():
-                    if event.type == QUIT:
-                        quit_game()
-                    if event.type == KEYDOWN and event.key == K_SPACE:
-                        game["show_popup"] = False
-                        level_1()
-                SCREEN.blit(fail_gameover_popup, (0, 0))
-                pygame.display.flip()
-                continue
-            
-            # Event detection
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    quit_game()
-                
-                keydown_detection(event, player, game, SCREEN, font, platforms)
-                # Release keys detection
-                keyup_detection(event, player)
-
-            launch_player_events(player, platforms, SCREEN)
-            
-            game["game_over"] = check_player_death(player, game, SCREEN, font)
-            
-            # Showing images and animations
-            SCREEN.blit(level_4_background, (0, 0))
-            
-            #Rino 1 enemy:
-            launch_rino_events(rino, player, SCREEN, 6)
-            
-            #Rino 2 enemy:
-            launch_rino_events(rino_2, player, SCREEN, 7)
-            
-            # Rino 3 enemy
-            launch_rino_events(rino_3, player, SCREEN, 8)
-            
-            # Rino 4 enemy
-            launch_rino_events(rino_4, player, SCREEN, 9)
-            
-            # Trunk 1 enemy
-            launch_trunk_events(trunk, player, SCREEN)
-            
-            # Trunk 2 enemy
-            launch_trunk_events(trunk_2, player, SCREEN)
-            
-            # Player animation
-            show_animation(SCREEN, player["animation"], 10, player["hitbox"]["rct"].x, player["hitbox"]["rct"].y)
-            
-            # Draw the player laser
-            launch_drawing_events(player, SCREEN, [trunk, trunk_2], game, font)
-            
-            artifact_appear_condition(trunk, trunk_2, rino, rino_2, rino_3, SCREEN, player, game)
-            
-            # GUI
-            show_hud(SCREEN, player, font)
-            
-            player["score"] = score_calculator(player)
-            endscreen(game, player, SCREEN, font)
-            # Refresh screen
-            pygame.display.flip()
+main_menu()
