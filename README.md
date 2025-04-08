@@ -38,6 +38,11 @@ Your mission: **survive, dodge enemies, find the Artifact and get off the planet
 
 ---
 
+## 📺 Watch Gameplay
+See Jungle Quest in action! In this video you can watch the full gameplay and how the mechanics work live.
+[![Watch the gameplay on YouTube](https://img.youtube.com/vi/LDWBX3Gc_dw/0.jpg)](https://www.youtube.com/watch?v=LDWBX3Gc_dw)
+
+---
 ## 🎮 Gameplay
 - **Movement:**  
   `W`, `A`, `S`, `D` to move.  
@@ -155,6 +160,12 @@ Tu misión: **sobrevivir, esquivar enemigos, encontrar el Artefacto y salir en u
 ## 🌌 Power-ups
 - **Estrella de invulnerabilidad: ![inv_star](https://github.com/Ivnfdzz/Jungle_Quest/blob/d4e3ba1fc01eec9c09a2aeb2d2e165b45276a5fc/src/assets/readme/invulnerability_star.png)**  
   Si la encontrás, la podés usar para volverte invulnerable por unos segundos. Puede marcar la diferencia entre la victoria o el reinicio.
+
+---
+
+## 📺 Ver Gameplay  
+¡Mirá *Jungle Quest* en acción! En este video podés ver el gameplay completo y cómo funcionan las mecánicas en vivo.  
+[![Ver el gameplay en YouTube](https://img.youtube.com/vi/LDWBX3Gc_dw/0.jpg)](https://www.youtube.com/watch?v=LDWBX3Gc_dw)
 
 ---
 
