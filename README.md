@@ -39,7 +39,7 @@ Your mission: **survive, dodge enemies, find the Artifact and get off the planet
 ---
 
 ## 📺 Watch Gameplay
-See Jungle Quest in action! In this video you can watch the full gameplay and how the mechanics work live.
+See Jungle Quest in action! Just click in this video where you can watch the full gameplay and how the mechanics work live.
 [![Watch the gameplay on YouTube](https://img.youtube.com/vi/LDWBX3Gc_dw/0.jpg)](https://www.youtube.com/watch?v=LDWBX3Gc_dw)
 
 ---
@@ -164,7 +164,7 @@ Tu misión: **sobrevivir, esquivar enemigos, encontrar el Artefacto y salir en u
 ---
 
 ## 📺 Ver Gameplay  
-¡Mirá *Jungle Quest* en acción! En este video podés ver el gameplay completo y cómo funcionan las mecánicas en vivo.  
+¡Mirá *Jungle Quest* en acción! Hace click en este video donde vas a poder ver el gameplay completo y cómo funcionan las mecánicas en vivo.  
 [![Ver el gameplay en YouTube](https://img.youtube.com/vi/LDWBX3Gc_dw/0.jpg)](https://www.youtube.com/watch?v=LDWBX3Gc_dw)
 
 ---
